@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
-import { Users, MessageSquare, TrendingUp, Plus, Trash2, ShieldCheck } from "lucide-react";
+import { Users, MessageSquare, TrendingUp, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,57 +29,23 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { getAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin")({
+  beforeLoad: ({ location }) => {
+    const auth = getAuth();
+    if (!auth || auth.role !== "admin") {
+      throw redirect({ to: "/login", search: { redirect: location.href, role: "admin" } });
+    }
+  },
   component: AdminView,
 });
 
 function AdminView() {
-  const [authed, setAuthed] = useState(false);
-  const [user, setUser] = useState("admin");
-  const [pw, setPw] = useState("");
-  const [err, setErr] = useState("");
-
   const [tips, setTips] = useState(initialHealthTips);
   const [newTitle, setNewTitle] = useState("");
   const [newBody, setNewBody] = useState("");
 
-  if (!authed) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <div className="size-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center mb-2">
-              <ShieldCheck className="size-6" />
-            </div>
-            <CardTitle>Admin Login</CardTitle>
-            <p className="text-sm text-muted-foreground">Demo: admin / admin</p>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Input value={user} onChange={(e) => setUser(e.target.value)} placeholder="Username" />
-            <Input
-              type="password"
-              value={pw}
-              onChange={(e) => setPw(e.target.value)}
-              placeholder="Password"
-            />
-            {err && <p className="text-xs text-destructive">{err}</p>}
-            <Button
-              className="w-full"
-              onClick={() => {
-                if (user === "admin" && pw === "admin") {
-                  setAuthed(true);
-                  setErr("");
-                } else setErr("Invalid credentials. Hint: admin / admin");
-              }}
-            >
-              Sign In
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   const addTip = () => {
     if (!newTitle.trim() || !newBody.trim()) return;
