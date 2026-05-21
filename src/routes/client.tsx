@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { Building2, Inbox, CheckCircle2, Clock, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,10 +15,18 @@ import {
 } from "@/components/ui/table";
 import { mockReferrals } from "@/lib/mock-data";
 import { toast } from "sonner";
+import { getAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/client")({
+  beforeLoad: ({ location }) => {
+    const auth = getAuth();
+    if (!auth || auth.role !== "client") {
+      throw redirect({ to: "/login", search: { redirect: location.href, role: "client" } });
+    }
+  },
   component: ClientView,
 });
+
 
 const statusColor: Record<string, string> = {
   New: "bg-primary/10 text-primary",
