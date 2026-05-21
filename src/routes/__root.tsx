@@ -105,7 +105,7 @@ function RootComponent() {
 }
 
 function LayoutSwitch() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const pathname = useRouterState({ select: (s: { location: { pathname: string } }) => s.location.pathname });
   if (pathname === "/login") {
     return <Outlet />;
   }
