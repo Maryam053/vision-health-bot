@@ -11,6 +11,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { AppSidebar, MobileNav } from "@/components/AppSidebar";
+import { TopNav, SiteFooter } from "@/components/PublicLayout";
 import { Toaster } from "@/components/ui/sonner";
 import { Heart } from "lucide-react";
 
@@ -115,24 +116,41 @@ function RootComponent() {
 
 function LayoutSwitch() {
   const pathname = useRouterState({ select: (s: { location: { pathname: string } }) => s.location.pathname });
+
   if (pathname === "/login") {
     return <Outlet />;
   }
-  return (
-    <div className="min-h-screen flex bg-background">
-      <AppSidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden sticky top-0 z-30 bg-card border-b px-4 py-3 flex items-center gap-2">
-          <div className="size-8 rounded-lg bg-primary flex items-center justify-center">
-            <Heart className="size-4 text-primary-foreground" fill="currentColor" />
-          </div>
-          <div className="font-bold">SehatBot</div>
-        </header>
-        <main className="flex-1 p-4 md:p-8 max-w-6xl w-full mx-auto">
-          <Outlet />
-        </main>
+
+  // Dashboard layout (sidebar) for admin & clinic portals
+  const isDashboard = pathname.startsWith("/admin") || pathname.startsWith("/client");
+  if (isDashboard) {
+    return (
+      <div className="min-h-screen flex bg-background">
+        <AppSidebar />
+        <div className="flex-1 flex flex-col min-w-0">
+          <header className="md:hidden sticky top-0 z-30 bg-card border-b px-4 py-3 flex items-center gap-2">
+            <div className="size-8 rounded-lg bg-primary flex items-center justify-center">
+              <Heart className="size-4 text-primary-foreground" fill="currentColor" />
+            </div>
+            <div className="font-bold">SehatBot</div>
+          </header>
+          <main className="flex-1 p-4 md:p-8 max-w-6xl w-full mx-auto">
+            <Outlet />
+          </main>
+        </div>
+        <MobileNav />
       </div>
-      <MobileNav />
+    );
+  }
+
+  // Public marketing layout (top nav + footer)
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <TopNav />
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      <SiteFooter />
     </div>
   );
 }
